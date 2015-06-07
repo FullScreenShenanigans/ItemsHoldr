@@ -17,11 +17,11 @@ var prefix = "MyStatsHoldr::",
 
 describe("constructor", function () {
     it("doesn't throw an error", function () {
-        new StatsHoldr();
+        new StatsHoldr.StatsHoldr();
     });
 
     it("correctly sets general settings", function () {
-        StatsHolder = new StatsHoldr({
+        StatsHolder = new StatsHoldr.StatsHoldr({
             "prefix": prefix,
             "autoSave": autoSave,
             "callbackArgs": callbackArgs,
@@ -72,7 +72,7 @@ describe("storage", function () {
     var storage = {};
 
     it("may take in a localStorage", function () {
-        StatsHolder = new StatsHoldr({
+        StatsHolder = new StatsHoldr.StatsHoldr({
             "prefix": prefix,
             "autoSave": autoSave,
             "callbackArgs": callbackArgs,
@@ -92,7 +92,7 @@ describe("storage", function () {
     });
 
     it("retrieves values", function () {
-        StatsHolder = new StatsHoldr({
+        StatsHolder = new StatsHoldr.StatsHoldr({
             "prefix": prefix,
             "autoSave": autoSave,
             "callbackArgs": callbackArgs,
@@ -112,7 +112,7 @@ describe("HTML", function () {
         values.lives.hasElement = true;
         values.tries.hasElement = true;
 
-        StatsHolder = new StatsHoldr({
+        StatsHolder = new StatsHoldr.StatsHoldr({
             "prefix": prefix,
             "autoSave": autoSave,
             "callbackArgs": callbackArgs,
