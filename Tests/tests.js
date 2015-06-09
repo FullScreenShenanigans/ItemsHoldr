@@ -38,33 +38,33 @@ describe("constructor", function () {
 
 describe("storage", function () {
     it("initializes values to a given valueDefault", function () {
-        chai.expect(StatsHolder.get("lives")).to.be.equal(3);
+        chai.expect(StatsHolder.getItem("lives")).to.be.equal(3);
     });
 
     it("initializes values to a given value", function () {
-        chai.expect(StatsHolder.get("tries")).to.be.equal(0);
+        chai.expect(StatsHolder.getItem("tries")).to.be.equal(0);
     });
 
     it("sets values", function () {
-        StatsHolder.set("tries", 3);
-        chai.expect(StatsHolder.get("tries")).to.be.equal(3);
+        StatsHolder.setItem("tries", 3);
+        chai.expect(StatsHolder.getItem("tries")).to.be.equal(3);
     });
 
     it("increases values", function () {
         StatsHolder.increase("tries");
-        chai.expect(StatsHolder.get("tries")).to.be.equal(4);
+        chai.expect(StatsHolder.getItem("tries")).to.be.equal(4);
     });
 
     it("decreases values", function () {
         StatsHolder.decrease("tries");
-        chai.expect(StatsHolder.get("tries")).to.be.equal(3);
+        chai.expect(StatsHolder.getItem("tries")).to.be.equal(3);
     });
 
     it("toggles values", function () {
         StatsHolder.toggle("tries");
-        chai.expect(StatsHolder.get("tries")).to.be.equal(0);
+        chai.expect(StatsHolder.getItem("tries")).to.be.equal(0);
         StatsHolder.toggle("tries");
-        chai.expect(StatsHolder.get("tries")).to.be.equal(1);
+        chai.expect(StatsHolder.getItem("tries")).to.be.equal(1);
     });
 });
 
@@ -100,8 +100,8 @@ describe("storage", function () {
             "localStorage": storage
         });
 
-        chai.expect(StatsHolder.get("lives")).to.be.equal(3);
-        chai.expect(StatsHolder.get("tries")).to.be.equal(0);
+        chai.expect(StatsHolder.getItem("lives")).to.be.equal(3);
+        chai.expect(StatsHolder.getItem("tries")).to.be.equal(0);
     });
 });
 
@@ -161,8 +161,8 @@ describe("HTML", function () {
     it("updates value elements", function () {
         var children = StatsHolder.getContainer().children[0].children;
 
-        StatsHolder.set("lives", 7);
-        StatsHolder.set("tries", 1);
+        StatsHolder.setItem("lives", 7);
+        StatsHolder.setItem("tries", 1);
 
         chai.expect(children[0].children[1].innerText).to.be.equal("7");
         chai.expect(children[1].children[1].innerText).to.be.equal("1");

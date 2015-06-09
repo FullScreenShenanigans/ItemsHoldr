@@ -1,66 +1,38 @@
+/// <reference path="StatsHoldr.d.ts" />
+
 module StatsHoldr {
     "use strict";
 
-    export interface IStatsValueSettings {
-        value?: any;
-        valueDefault?: any;
-        hasElement?: boolean;
-        elementTag?: string;
-        storeLocally?: boolean;
-        triggers?: any;
-        modularity?: number;
-        onModular?: any;
-        digits?: number;
-        minimum?: number;
-        onMinimum?: any;
-        maximum?: number;
-        onMaximum?: number;
-    }
+    export class StatsValue implements IStatsValue {
+        value: any;
 
-    export interface IStatsHoldrSettings {
-        prefix: string;
-        proliferate: any;
-        createElement: any;
-        autoSave?: boolean;
-        callbackArgs?: any[];
-        localStorage?: any;
-        defaults?: any;
-        displayChanges?: any;
-        values?: any;
-        doMakeContainer?: boolean;
-        containersArguments?: any[][]
-    }
+        element: HTMLElement;
 
-    export class StatsValue {
-        private StatsHolder: StatsHoldr;
+        hasElement: boolean;
 
-        private key: string;
+        StatsHolder: StatsHoldr;
 
-        private value: any;
+        key: string;
 
-        private valueDefault: any;
+        valueDefault: any;
 
-        private hasElement: boolean;
+        elementTag: string;
 
-        private element: HTMLElement;
+        minimum: number;
 
-        private elementTag: string;
+        maximum: number;
 
-        private minimum: number;
+        modularity: number;
 
-        private maximum: number;
+        triggers: any;
 
-        private modularity: number;
+        onModular: Function;
 
-        private triggers: any;
+        onMinimum: Function;
 
-        private onModular: Function;
+        onMaximum: Function;
 
-        private onMinimum: Function;
-
-        private onMaximum: Function;
-
-        private storeLocally: boolean;
+        storeLocally: boolean;
 
         /**
          * Creates a new StatsValue with the given key and settings. Defaults are given
@@ -71,7 +43,7 @@ module StatsHoldr {
          * @param {String} key   The key to reference this new StatsValue by.
          * @param {IStatsValueSettings} settings   Any optional custom settings.
          */
-        constructor(StatsHolder: StatsHoldr, key: string, settings: any) {
+        constructor(StatsHolder: StatsHoldr, key: string, settings: any = {}) {
             this.StatsHolder = StatsHolder;
 
             StatsHolder.proliferate(this, StatsHolder.getDefaults());
@@ -225,26 +197,29 @@ module StatsHoldr {
     }
 
     /**
-     * StatsHoldr
      * A versatile container to store and manipulate values in localStorage, and
      * optionally keep an updated HTML container showing these values. Operations 
      * such as setting, increasing/decreasing, and default values are all abstracted
      * automatically. StatsValues are stored in memory as well as in localStorage for
      * fast lookups.
-     * Each StatsHoldr instance requires proliferate and createElement functions 
-     * (such as those given by the EightBittr prototype).
      * 
      * @author "Josh Goldberg" <josh@fullscreenmario.com>
      */
-    export class StatsHoldr {
-        // The objects being stored, keyed as Object<Object>.
-        private values: any;
+    export class StatsHoldr implements IStatsHoldr {
+        // The StatsValues being stored, keyed by name.
+        private items: { [i: string]: StatsValue };
 
-        // Default attributes for value, as Object<Object>.
-        private defaults: any;
+        // A listing of all the String keys for the stored items.
+        private itemKeys: string[];
+
+        // Default attributes for StatsValue objects.
+        private defaults: { [i: string]: any };
 
         // A reference to localStorage or a replacement object.
-        private localStorage: any;
+        private localStorage: Storage;
+
+        // Whether new items are allowed to be created using setItem.
+        private allowNewItems: boolean;
 
         // Whether this should save changes to localStorage automatically
         private autoSave: boolean;
@@ -253,7 +228,7 @@ module StatsHoldr {
         private prefix: string;
 
         // A container element containing children for each value's element.
-        private container: any;
+        private container: HTMLElement;
 
         // An Array of elements as createElement arguments, outside-to-inside.
         private containersArguments: any[][];
@@ -268,46 +243,20 @@ module StatsHoldr {
          * Resets the StatsHoldr.
          * 
          * @constructor
-         * @param {String} prefix   A String prefix to prepend to key names in 
-         *                          localStorage.
-         * @param {Function} proliferate   A Function that takes in a recipient 
-         *                                 Object and a donor Object, and copies
-         *                                 attributes over. Generally given by
-         *                                 EightBittr.prototype to minimize 
-         *                                 duplicate code.
-         * @param {Function} createElement   A Function to create an Element of a
-         *                                   given String type and apply attributes
-         *                                   from subsequent Objects. Generally 
-         *                                   given by EightBittr.prototype to reduce
-         *                                   duplicate code.
-         * @param {Object} [values]   The keyed values to be stored, as well as all
-         *                            associated information with them. The names of
-         *                            values are keys in the values Object.
-         * @param {Object} [localStorage]   A substitute for localStorage, generally
-         *                                  used as a shim (defaults to window's 
-         *                                  localStorage, or a new Object if that
-         *                                  does not exist).
-         * @param {Boolean} [autoSave]   Whether this should save changes to 
-         *                               localStorage automatically (by default,
-         *                               false).
-         * @param {Boolean} [doMakeContainer]   Whether an HTML container with 
-         *                                      children for each value should be
-         *                                      made (defaults to false).
-         * @param {Object} [defaults]   Default attributes for each value.
-         * @param {Array} [callbackArgs]   Arguments to pass via Function.apply to 
-         *                                 triggered callbacks (defaults to []).
+         * @param {IStatsHoldrSettings} settings
          */
-        constructor(settings: IStatsHoldrSettings = <IStatsHoldrSettings>{}) {
+        constructor(settings: IStatsHoldrSettings = {}) {
             var key: string;
 
             this.prefix = settings.prefix || "";
             this.autoSave = settings.autoSave;
+            this.allowNewItems = settings.allowNewItems;
             this.callbackArgs = settings.callbackArgs || [];
 
             if (settings.localStorage) {
                 this.localStorage = settings.localStorage;
             } else if (typeof localStorage === "undefined") {
-                this.localStorage = {};
+                this.localStorage = this.createPlaceholderStorage();
             } else {
                 this.localStorage = localStorage;
             }
@@ -315,13 +264,17 @@ module StatsHoldr {
             this.defaults = settings.defaults || {};
             this.displayChanges = settings.displayChanges || {};
 
-            this.values = {};
+            this.items = {};
             if (settings.values) {
+                this.itemKeys = Object.keys(settings.values);
+
                 for (key in settings.values) {
                     if (settings.values.hasOwnProperty(key)) {
-                        this.addStatistic(key, settings.values[key]);
+                        this.addItem(key, settings.values[key]);
                     }
                 }
+            } else {
+                this.itemKeys = [];
             }
 
             if (settings.doMakeContainer) {
@@ -339,10 +292,17 @@ module StatsHoldr {
         */
 
         /**
+         * 
+         */
+        key(index: number): string {
+            return this.itemKeys[index];
+        }
+
+        /**
          * @return {Mixed} The values contained within, keyed by their keys.
          */
-        getValues(): any {
-            return this.values;
+        getValues(): { [i: string]: IStatsValue } {
+            return this.items;
         }
 
         /**
@@ -355,7 +315,7 @@ module StatsHoldr {
         /**
          * @return {Mixed} A reference to localStorage or a replacment object.
          */
-        getLocalStorage(): any {
+        getLocalStorage(): Storage {
             return this.localStorage;
         }
 
@@ -411,17 +371,17 @@ module StatsHoldr {
          * @return {String[]} The names of all value's keys.
          */
         getKeys(): string[] {
-            return Object.keys(this.values);
+            return Object.keys(this.items);
         }
 
         /**
          * @param {String} key   The key for a known value.
          * @return {Mixed} The known value of a key, assuming that key exists.
          */
-        get(key: string): any {
+        getItem(key: string): any {
             this.checkExistence(key);
 
-            return this.values[key].value;
+            return this.items[key].value;
         }
 
         /**
@@ -429,7 +389,7 @@ module StatsHoldr {
          * @return {Object} The settings for that particular key.
          */
         getObject(key: string): any {
-            return this.values[key];
+            return this.items[key];
         }
 
         /**
@@ -437,27 +397,20 @@ module StatsHoldr {
          * @return {Boolean} Whether there is a value under that key.
          */
         hasKey(key: string): boolean {
-            return this.values.hasOwnProperty(key);
-        }
-
-        /**
-         * @return {Object} The objects being stored.
-         */
-        getStatsValues(): any {
-            return this.values;
+            return this.items.hasOwnProperty(key);
         }
 
         /**
          * @return {Object} A mapping of key names to the actual values of all 
          *                  objects being stored.
          */
-        export(): any {
+        exportItems(): any {
             var output: any = {},
                 i: string;
 
-            for (i in this.values) {
-                if (this.values.hasOwnProperty(i)) {
-                    output[i] = this.values[i].value;
+            for (i in this.items) {
+                if (this.items.hasOwnProperty(i)) {
+                    output[i] = this.items[i].value;
                 }
             }
 
@@ -475,13 +428,54 @@ module StatsHoldr {
          * @param {Object} settings   The settings for the new StatsValue.
          * @return {StatsValue} The newly created StatsValue.
          */
-        addStatistic(key: string, settings: any): StatsValue {
-            return this.values[key] = new StatsValue(this, key, settings);
+        addItem(key: string, settings: any = {}): StatsValue {
+            this.items[key] = new StatsValue(this, key, settings);
+            this.itemKeys.push(key);
+            return this.items[key];
         }
 
 
         /* Updating values
         */
+
+        /**
+         * Clears a value from the listing, and removes its element from the
+         * container (if they both exist).
+         * 
+         * @param {String} key   The key of the element to remove.
+         */
+        removeItem(key: string): void {
+            if (!this.items.hasOwnProperty(key)) {
+                return;
+            }
+
+            if (this.container && this.items[key].hasElement) {
+                this.container.removeChild(this.items[key].element);
+            }
+
+            this.itemKeys.splice(this.itemKeys.indexOf(key), 1);
+
+            delete this.items[key];
+        }
+
+        /**
+         * Completely clears all values from the StatsHoldr, removing their
+         * elements from the container (if they both exist) as well.
+         */
+        clear(): void {
+            var i: string;
+
+            if (this.container) {
+                for (i in this.items) {
+                    if (this.items[i].hasElement) {
+                        this.container.removeChild(this.items[i].element);
+                    }
+                }
+            }
+
+            this.items = {};
+            this.itemKeys = [];
+        }
 
         /**
          * Sets the value for the StatsValue under the given key, then updates the StatsValue
@@ -490,11 +484,11 @@ module StatsHoldr {
          * @param {String} key   The key of the StatsValue.
          * @param {Mixed} value   The new value for the StatsValue.
          */
-        set(key: string, value: any): void {
+        setItem(key: string, value: any): void {
             this.checkExistence(key);
 
-            this.values[key].value = <string>value;
-            this.values[key].update();
+            this.items[key].value = <string>value;
+            this.items[key].update();
         }
 
         /**
@@ -507,8 +501,8 @@ module StatsHoldr {
         increase(key: string, amount: number | string = 1): void {
             this.checkExistence(key);
 
-            this.values[key].value += arguments.length > 1 ? amount : 1;
-            this.values[key].update();
+            this.items[key].value += arguments.length > 1 ? amount : 1;
+            this.items[key].update();
         }
 
         /**
@@ -521,8 +515,8 @@ module StatsHoldr {
         decrease(key: string, amount: number = 1): void {
             this.checkExistence(key);
 
-            this.values[key].value -= amount;
-            this.values[key].update();
+            this.items[key].value -= amount;
+            this.items[key].update();
         }
 
         /**
@@ -532,18 +526,23 @@ module StatsHoldr {
          */
         toggle(key: string): void {
             this.checkExistence(key);
-            this.values[key].value = this.values[key].value ? 0 : 1;
-            this.values[key].update();
+            this.items[key].value = this.items[key].value ? 0 : 1;
+            this.items[key].update();
         }
 
         /**
-         * Ensures a key exists in values, and throws an Error if it doesn't.
+         * Ensures a key exists in values. If it doesn't, and new values are
+         * allowed, it creates it; otherwise, it throws an Error.
          * 
          * @param {String} key
          */
         checkExistence(key: string): void {
-            if (!this.values.hasOwnProperty(key)) {
-                throw new Error("Unknown key given to StatsHoldr: '" + key + "'.");
+            if (!this.items.hasOwnProperty(key)) {
+                if (this.allowNewItems) {
+                    this.addItem(key);
+                } else {
+                    throw new Error("Unknown key given to StatsHoldr: '" + key + "'.");
+                }
             }
         }
 
@@ -551,9 +550,9 @@ module StatsHoldr {
          * Manually saves all values to localStorage, ignoring the autoSave flag. 
          */
         saveAll(): void {
-            for (var key in this.values) {
-                if (this.values.hasOwnProperty(key)) {
-                    this.values[key].updateLocalStorage(true);
+            for (var key in this.items) {
+                if (this.items.hasOwnProperty(key)) {
+                    this.items[key].updateLocalStorage(true);
                 }
             }
         }
@@ -601,9 +600,9 @@ module StatsHoldr {
                 current = child;
             }
 
-            for (key in this.values) {
-                if (this.values[key].hasElement) {
-                    child.appendChild(this.values[key].element);
+            for (key in this.items) {
+                if (this.items[key].hasElement) {
+                    child.appendChild(this.items[key].element);
                 }
             }
 
@@ -687,5 +686,51 @@ module StatsHoldr {
             return recipient;
         }
 
+        /**
+         * Creates an Object that can be used to create a new LocalStorage
+         * replacement, if the JavaScript environment doesn't have one.
+         * 
+         * @return {Object}
+         */
+        private createPlaceholderStorage(): Storage {
+            var i: string,
+                output: any = {
+                    "keys": [],
+                    "getItem": function (key: string): any {
+                        return this.localStorage[key];
+                    },
+                    "setItem": function (key: string, value: string): void {
+                        this.localStorage[key] = value;
+                    },
+                    "clear": function (): void {
+                        for (i in this) {
+                            if (this.hasOwnProperty(i)) {
+                                delete this[i];
+                            }
+                        }
+                    },
+                    "removeItem": function (key: string): void {
+                        delete this[key];
+                    },
+                    "key": function (index: number): string {
+                        return this.keys[index];
+                    }
+                };
+
+            Object.defineProperties(output, {
+                "length": {
+                    "get": function (): number {
+                        return output.keys.length;
+                    }
+                },
+                "remainingSpace": {
+                    "get": function (): number {
+                        return 9001; // Is there a way to calculate this?
+                    }
+                }
+            });
+
+            return output;
+        }
     }
 }
