@@ -67,7 +67,7 @@ declare module StatsHoldr {
         getObject(key: string): any;
         hasKey(key: string): boolean;
         exportItems(): any;
-        addItem(key: string, settings: any): StatsValue;
+        addItem(key: string, settings: any): IStatsValue;
         setItem(key: string, value: any): void;
         increase(key: string, amount?: number | string): void;
     }

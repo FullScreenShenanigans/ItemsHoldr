@@ -643,7 +643,7 @@ module StatsHoldr {
 
             // For each provided object, add those settings to the element
             for (i = 0; i < args.length; i += 1) {
-                this.proliferate(element, args[i]);
+                this.proliferateElement(element, args[i]);
             }
 
             return element;
@@ -680,6 +680,61 @@ module StatsHoldr {
                     } else {
                         // Regular primitives are easy to copy otherwise
                         recipient[i] = setting;
+                    }
+                }
+            }
+            return recipient;
+        }
+
+        /**
+         * Identical to proliferate, but tailored for HTML elements because many
+         * element attributes don't play nicely with JavaScript Array standards. 
+         * Looking at you, HTMLCollection!
+         * 
+         * @param {HTMLElement} recipient
+         * @param {Any} donor
+         * @param {Boolean} [noOverride]
+         * @return {HTMLElement}
+         */
+        proliferateElement(recipient: any, donor: any, noOverride: boolean = false): HTMLElement {
+            var setting: any,
+                i: string,
+                j: number;
+
+            // For each attribute of the donor:
+            for (i in donor) {
+                if (donor.hasOwnProperty(i)) {
+                    // If noOverride, don't override already existing properties
+                    if (noOverride && recipient.hasOwnProperty(i)) {
+                        continue;
+                    }
+
+                    setting = donor[i];
+
+                    // Special cases for HTML elements
+                    switch (i) {
+                        // Children: just append all of them directly
+                        case "children":
+                            if (typeof (setting) !== "undefined") {
+                                for (j = 0; j < setting.length; j += 1) {
+                                    recipient.appendChild(setting[j]);
+                                }
+                            }
+                            break;
+
+                        // By default, use the normal proliferate logic
+                        default:
+                            // If it's an object, recurse on a new version of it
+                            if (typeof setting === "object") {
+                                if (!recipient.hasOwnProperty(i)) {
+                                    recipient[i] = new setting.constructor();
+                                }
+                                this.proliferate(recipient[i], setting, noOverride);
+                            } else {
+                                // Regular primitives are easy to copy otherwise
+                                recipient[i] = setting;
+                            }
+                            break;
                     }
                 }
             }
