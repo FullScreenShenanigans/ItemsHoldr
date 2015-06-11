@@ -722,6 +722,11 @@ module StatsHoldr {
                             }
                             break;
 
+                        // Style: proliferate (instead of making a new Object)
+                        case "style":
+                            this.proliferate(recipient[i], setting);
+                            break;
+
                         // By default, use the normal proliferate logic
                         default:
                             // If it's an object, recurse on a new version of it
