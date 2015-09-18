@@ -569,7 +569,7 @@ module ItemsHoldr {
         }
 
         /**
-         * Toggles whether a value is 1 or 0.
+         * Toggles whether a value is true or false.
          * 
          * @param {String} key   The key of the ItemValue.
          */
@@ -578,7 +578,7 @@ module ItemsHoldr {
 
             var value: any = this.items[key].getValue();
 
-            value = value ? 0 : 1;
+            value = value ? false : true;
 
             this.items[key].setValue(value);
         }
