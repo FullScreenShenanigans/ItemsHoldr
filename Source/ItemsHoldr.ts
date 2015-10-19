@@ -5,6 +5,8 @@
 // @include ../Source/ItemsHoldr.d.ts
 
 module ItemsHoldr {
+    "use strict";
+
     /**
      * Storage container for a single ItemsHoldr value. The value may have triggers
      * assigned to value, modularity, and other triggers, as well as an HTML element.
@@ -24,12 +26,12 @@ module ItemsHoldr {
          * A default initial value to store, if value isn't provided.
          */
         valueDefault: any;
-        
+
         /**
          * Whether the value should be stored in the ItemHoldr's localStorage.
          */
         storeLocally: boolean;
-        
+
         /**
          * A mapping of values to callbacks that should be triggered when value
          * is equal to them.
@@ -40,7 +42,7 @@ module ItemsHoldr {
          * An HTML element whose second child's textContent is always set to that of the element.
          */
         element: HTMLElement;
-        
+
         /**
          * Whether an Element should be created and synced to the value.
          */
@@ -50,12 +52,12 @@ module ItemsHoldr {
          * An Element tag to use in creating the element, if hasElement is true.
          */
         elementTag: string;
-        
+
         /**
          * A minimum value for the value to equal, if value is a number.
          */
         minimum: number;
-        
+
         /**
          * A callback to call when the value reaches the minimum value.
          */
@@ -70,22 +72,22 @@ module ItemsHoldr {
          * A callback to call when the value reaches the maximum value.
          */
         onMaximum: Function;
-        
+
         /**
          * A maximum number to modulo the value against, if value is a number.
          */
         modularity: number;
-        
+
         /**
          * A callback to call when the value reaches modularity.
          */
         onModular: Function;
-        
+
         /**
          * A Function to transform the value when it's being set.
          */
         transformGet: Function;
-        
+
         /**
          * A Function to transform the value when it's being retrieved.
          */
