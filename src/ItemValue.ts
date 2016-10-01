@@ -1,9 +1,9 @@
-import { IItemValue, ITriggers } from "./IItemValue";
 import { IItemsHoldr } from "./IItemsHoldr";
+import { IItemValue, ITriggers } from "./IItemValue";
 
 /**
  * Storage container for a single ItemsHoldr value. The value may have triggers
- * assigned to value, modularity, and other triggers, as well as an HTML element.
+ * assigned to value, modularity, and other triggers.
  */
 export class ItemValue implements IItemValue {
     /**
@@ -31,21 +31,6 @@ export class ItemValue implements IItemValue {
      * is equal to them.
      */
     private triggers: ITriggers;
-
-    /**
-     * An HTML element whose second child's textContent is always set to that of the element.
-     */
-    private element: HTMLElement;
-
-    /**
-     * Whether an Element should be created and synced to the value.
-     */
-    private hasElement: boolean;
-
-    /**
-     * An Element tag to use in creating the element, if hasElement is true.
-     */
-    private elementTag: string;
 
     /**
      * A minimum value for the value to equal, if value is a number.
@@ -96,7 +81,6 @@ export class ItemValue implements IItemValue {
      * Creates a new ItemValue with the given key and settings. Defaults are given
      * to the value via proliferate before the settings.
      * 
-     * @constructor
      * @param ItemsHolder   The container for this value.
      * @param key   The key to reference this new ItemValue by.
      * @param settings   Any optional custom settings.
@@ -111,18 +95,6 @@ export class ItemValue implements IItemValue {
 
         if (!this.hasOwnProperty("value")) {
             this.value = this.valueDefault;
-        }
-
-        if (this.hasElement) {
-            this.element = ItemsHolder.createElement(this.elementTag || "div", {
-                className: ItemsHolder.getPrefix() + "_value " + key
-            });
-            this.element.appendChild(ItemsHolder.createElement("div", {
-                "textContent": key
-            }));
-            this.element.appendChild(ItemsHolder.createElement("div", {
-                "textContent": this.value
-            }));
         }
 
         if (this.storeLocally) {
@@ -165,26 +137,21 @@ export class ItemValue implements IItemValue {
     }
 
     /**
-     * @returns The stored HTML element, if it exists.
-     */
-    public getElement(): HTMLElement {
-        return this.element;
-    }
-
-    /**
      * General update Function to be run whenever the internal value is changed.
-     * It runs all the trigger, modular, etc. checks, updates the HTML element
-     * if there is one, and updates localStorage if needed.
+     * It runs all the trigger, modular, etc. checks, and updates localStorage 
+     * if needed.
      */
     public update(): void {
         // Mins and maxes must be obeyed before any other considerations
         if (this.hasOwnProperty("minimum") && Number(this.value) <= Number(this.minimum)) {
             this.value = this.minimum;
+
             if (this.onMinimum) {
                 this.onMinimum.apply(this, this.ItemsHolder.getCallbackArgs());
             }
         } else if (this.hasOwnProperty("maximum") && Number(this.value) <= Number(this.maximum)) {
             this.value = this.maximum;
+
             if (this.onMaximum) {
                 this.onMaximum.apply(this, this.ItemsHolder.getCallbackArgs());
             }
@@ -196,10 +163,6 @@ export class ItemValue implements IItemValue {
 
         if (this.triggers) {
             this.checkTriggers();
-        }
-
-        if (this.hasElement) {
-            this.updateElement();
         }
 
         if (this.storeLocally) {
@@ -241,20 +204,10 @@ export class ItemValue implements IItemValue {
 
         while (this.value >= this.modularity) {
             this.value = Math.max(0, this.value - this.modularity);
+
             if (this.onModular) {
                 this.onModular.apply(this, this.ItemsHolder.getCallbackArgs());
             }
-        }
-    }
-
-    /**
-     * Updates the ItemValue's element's second child to be the ItemValue's value.
-     */
-    private updateElement(): void {
-        if (this.ItemsHolder.hasDisplayChange(this.value)) {
-            this.element.children[1].textContent = this.ItemsHolder.getDisplayChange(this.value);
-        } else {
-            this.element.children[1].textContent = this.value;
         }
     }
 
@@ -271,7 +224,7 @@ export class ItemValue implements IItemValue {
             return undefined;
         }
 
-        if (value.constructor !== String) {
+        if (value.constructor !== "".constructor) {
             return value;
         }
 

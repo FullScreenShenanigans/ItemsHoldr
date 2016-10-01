@@ -1,12 +1,14 @@
 /// <reference path="../../node_modules/@types/chai/index.d.ts" />
 /// <reference path="../../node_modules/@types/mocha/index.d.ts" />
-/// <reference path="../../lib/ItemsHoldr.d.ts" />
 /// <reference path="../utils/MochaLoader.ts" />
-/// <reference path="../utils/mocks.ts" />
 
-mochaLoader.addTest("switches from true to false", (): void => {
+import { IItemsHoldr } from "../../src/IItemsHoldr";
+import { mochaLoader } from "../main";
+import { mocks } from "../utils/mocks";
+
+mochaLoader.it("switches from true to false", (): void => {
     // Arrange
-    const ItemsHolder: ItemsHoldr.IItemsHoldr = mocks.mockItemsHoldr({
+    const ItemsHolder: IItemsHoldr = mocks.mockItemsHoldr({
         values: {
             alive: {
                 valueDefault: true
@@ -21,9 +23,9 @@ mochaLoader.addTest("switches from true to false", (): void => {
     chai.expect(ItemsHolder.getItem("alive")).to.equal(false);
 });
 
-mochaLoader.addTest("switches from false to true", (): void => {
+mochaLoader.it("switches from false to true", (): void => {
     // Arrange
-    const ItemsHolder: ItemsHoldr.IItemsHoldr = mocks.mockItemsHoldr({
+    const ItemsHolder: IItemsHoldr = mocks.mockItemsHoldr({
         values: {
             alive: {
                 valueDefault: false

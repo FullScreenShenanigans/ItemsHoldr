@@ -45,26 +45,10 @@ export interface IItemsHoldrSettings {
      * Default attributes for IItemValues.
      */
     defaults?: IItemValueDefaults;
-
-    /**
-     * Any hardcoded changes to element content.
-     */
-    displayChanges?: { [i: string]: string };
-
-    /**
-     * Whether an HTML container should be created to house the IItemValue elements.
-     */
-    doMakeContainer?: boolean;
-
-    /**
-     * Arguments to pass to create the container, if not the default div and className.
-     */
-    containersArguments?: [string, any][];
 }
 
 /**
- * A versatile container to store and manipulate values in localStorage, and 
- * optionally keep an updated HTML container showing these values.
+ * A versatile container to store and manipulate values in localStorage.
  */
 export interface IItemsHoldr {
     /**
@@ -91,21 +75,6 @@ export interface IItemsHoldr {
      * @returns The prefix to store thigns under in localStorage.
      */
     getPrefix(): string;
-
-    /**
-     * @returns The container HTML element, if it exists.
-     */
-    getContainer(): HTMLElement;
-
-    /**
-     * @returns createElement arguments for HTML containers, outside-to-inside.
-     */
-    getContainersArguments(): [string, any][];
-
-    /**
-     * @returns Any hard-coded changes to element content.
-     */
-    getDisplayChanges(): { [i: string]: string };
 
     /**
      * @returns Arguments to be passed to triggered event callbacks.
@@ -146,7 +115,7 @@ export interface IItemsHoldr {
     exportItems(): any;
 
     /**
-     * Adds a new key & value pair to by linking to a newly created ItemValue.
+     * Adds a new key & value pair to by linking to a newly created IItemValue.
      * 
      * @param key   The key to reference by new ItemValue by.
      * @param settings   The settings for the new ItemValue.
@@ -155,16 +124,14 @@ export interface IItemsHoldr {
     addItem(key: string, settings?: any): IItemValue;
 
     /**
-     * Clears a value from the listing, and removes its element from the
-     * container (if they both exist).
+     * Clears a value from the listing.
      * 
-     * @param key   The key of the element to remove.
+     * @param key   The key of the item to remove.
      */
     removeItem(key: string): void;
 
     /**
-     * Completely clears all values from the ItemsHoldr, removing their
-     * elements from the container (if they both exist) as well.
+     * Completely clears all values.
      */
     clear(): void;
 
@@ -223,50 +190,6 @@ export interface IItemsHoldr {
     saveAll(): void;
 
     /**
-     * Hides the container Element by setting its visibility to hidden.
-     */
-    hideContainer(): void;
-
-    /**
-     * Shows the container Element by setting its visibility to visible.
-     */
-    displayContainer(): void;
-
-    /**
-     * Creates the container Element, which contains a child for each ItemValue that
-     * specifies hasElement to be true.
-     * 
-     * @param containers   An Array representing the Element to be created and the
-     *                     children between it and the contained ItemValues. 
-     *                     Each contained Object has a String tag name as its 
-     *                     first member, followed by any number of Objects to apply 
-     *                     via createElement.
-     * @returns A newly created Element that can be used as a container.
-     */
-    makeContainer(containers: [string, any][]): HTMLElement;
-
-    /**
-     * @returns Whether displayChanges has an entry for a particular value.
-     */
-    hasDisplayChange(value: string): boolean;
-
-    /**
-     * @returns The displayChanges entry for a particular value.
-     */
-    getDisplayChange(value: string): string;
-
-    /**
-     * Creates a new HTMLElement of the given type. For each Object given as
-     * arguments after, each member is proliferated onto the element.
-     * 
-     * @param tag   The type of the HTMLElement (by default, "div").
-     * @param args   Any number of Objects to be proliferated onto the 
-     *               new HTMLElement.
-     * @returns A newly created HTMLElement of the given tag.
-     */
-    createElement(tag?: string, ...args: any[]): HTMLElement;
-
-    /**
      * Proliferates all members of the donor to the recipient recursively, as
      * a deep copy.
      * 
@@ -277,17 +200,4 @@ export interface IItemsHoldr {
      * @returns The recipient, which should have the donor proliferated onto it.
      */
     proliferate(recipient: any, donor: any, noOverride?: boolean): any;
-
-    /**
-     * Identical to proliferate, but tailored for HTML elements because many
-     * element attributes don't play nicely with JavaScript Array standards. 
-     * Looking at you, HTMLCollection!
-     * 
-     * @param recipient   An HTMLElement receiving the donor's members.
-     * @param donor   An object whose members are copied to recipient.
-     * @param noOverride   If recipient properties may be overriden (by 
-     *                     default, false).
-     * @returns The recipient, which should have the donor proliferated onto it.
-     */
-    proliferateElement(recipient: any, donor: any, noOverride?: boolean): any;
 }

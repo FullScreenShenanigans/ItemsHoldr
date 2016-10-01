@@ -8,7 +8,7 @@ export interface ITriggers {
 
 /**
  * A container of default values to pass to IItemValues, keyed by the
- * IItemValue keys.m
+ * IItemValue keys.
  */
 export interface IItemValueDefaults {
     [i: string]: IItemValueSettings;
@@ -38,16 +38,6 @@ export interface IItemValueSettings {
      * is equal to them.
      */
     triggers?: ITriggers;
-
-    /**
-     * Whether an Element should be created and synced to the value.
-     */
-    hasElement?: boolean;
-
-    /**
-     * An Element tag to use in creating the element, if hasElement is true.
-     */
-    elementTag?: string;
 
     /**
      * A minimum value for the value to equal, if value is a number.
@@ -92,7 +82,7 @@ export interface IItemValueSettings {
 
 /**
  * Storage container for a single IItemsHoldr value. The value may have triggers
- * assigned to value, modularity, and other triggers, as well as an HTML element.
+ * assigned to value, modularity, and other triggers.
  */
 export interface IItemValue {
     /**
@@ -109,14 +99,9 @@ export interface IItemValue {
     setValue(value: any): void;
 
     /**
-     * @returns The stored HTML element, if it exists.
-     */
-    getElement(): HTMLElement;
-
-    /**
      * General update Function to be run whenever the internal value is changed.
-     * It runs all the trigger, modular, etc. checks, updates the HTML element
-     * if there is one, and updates localStorage if needed.
+     * It runs all the trigger, modular, etc. checks, and updates localStorage
+     * if needed.
      */
     update(): void;
 

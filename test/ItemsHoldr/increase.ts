@@ -1,12 +1,14 @@
 /// <reference path="../../node_modules/@types/chai/index.d.ts" />
 /// <reference path="../../node_modules/@types/mocha/index.d.ts" />
-/// <reference path="../../lib/ItemsHoldr.d.ts" />
 /// <reference path="../utils/MochaLoader.ts" />
-/// <reference path="../utils/mocks.ts" />
 
-mochaLoader.addTest("adds to a Number type value", (): void => {
+import { IItemsHoldr } from "../../src/IItemsHoldr";
+import { mochaLoader } from "../main";
+import { mocks } from "../utils/mocks";
+
+mochaLoader.it("adds to a Number type value", (): void => {
     // Arrange
-    const ItemsHolder: ItemsHoldr.IItemsHoldr = mocks.mockItemsHoldr({
+    const ItemsHolder: IItemsHoldr = mocks.mockItemsHoldr({
         values: {
             weight: {
                 valueDefault: 100
@@ -21,9 +23,9 @@ mochaLoader.addTest("adds to a Number type value", (): void => {
     chai.expect(ItemsHolder.getItem("weight")).to.equal(103);
 });
 
-mochaLoader.addTest("concatenates to a String type value", (): void => {
+mochaLoader.it("concatenates to a String type value", (): void => {
     // Arrange
-    const ItemsHolder: ItemsHoldr.IItemsHoldr = mocks.mockItemsHoldr({
+    const ItemsHolder: IItemsHoldr = mocks.mockItemsHoldr({
         values: {
             color: {
                 valueDefault: "red"

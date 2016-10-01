@@ -1,12 +1,14 @@
 /// <reference path="../../node_modules/@types/chai/index.d.ts" />
 /// <reference path="../../node_modules/@types/mocha/index.d.ts" />
-/// <reference path="../../lib/ItemsHoldr.d.ts" />
 /// <reference path="../utils/MochaLoader.ts" />
-/// <reference path="../utils/mocks.ts" />
 
-mochaLoader.addTest("saves changes to items to localStorage", (): void => {
+import { IItemsHoldr } from "../../src/IItemsHoldr";
+import { mochaLoader } from "../main";
+import { mocks } from "../utils/mocks";
+
+mochaLoader.it("saves changes to items to localStorage", (): void => {
     // Arrange
-    const ItemsHolder: ItemsHoldr.IItemsHoldr = mocks.mockItemsHoldr({
+    const ItemsHolder: IItemsHoldr = mocks.mockItemsHoldr({
         values: {
             color: {
                 valueDefault: "red"

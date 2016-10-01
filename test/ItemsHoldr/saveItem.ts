@@ -1,12 +1,14 @@
 /// <reference path="../../node_modules/@types/chai/index.d.ts" />
 /// <reference path="../../node_modules/@types/mocha/index.d.ts" />
-/// <reference path="../../lib/ItemsHoldr.d.ts" />
 /// <reference path="../utils/MochaLoader.ts" />
-/// <reference path="../utils/mocks.ts" />
 
-mochaLoader.addTest("should throw an error for an unknown item", (): void => {
+import { IItemsHoldr } from "../../src/IItemsHoldr";
+import { mochaLoader } from "../main";
+import { mocks } from "../utils/mocks";
+
+mochaLoader.it("should throw an error for an unknown item", (): void => {
     // Arrange
-    const ItemsHolder: ItemsHoldr.IItemsHoldr = mocks.mockItemsHoldr();
+    const ItemsHolder: IItemsHoldr = mocks.mockItemsHoldr();
 
     // Act
     const test: Function = (): void => ItemsHolder.saveItem("color");
@@ -15,9 +17,9 @@ mochaLoader.addTest("should throw an error for an unknown item", (): void => {
     chai.expect(test).to.throw("Unknown key given to ItemsHoldr: 'color'.");
 });
 
-mochaLoader.addTest("saves item to localStorage", (): void => {
+mochaLoader.it("saves item to localStorage", (): void => {
     // Arrange
-    const ItemsHolder: ItemsHoldr.IItemsHoldr = mocks.mockItemsHoldr({
+    const ItemsHolder: IItemsHoldr = mocks.mockItemsHoldr({
         values: {
             color: {
                 valueDefault: "red"

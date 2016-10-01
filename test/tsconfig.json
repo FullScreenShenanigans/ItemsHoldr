@@ -1,14 +1,15 @@
 {
     "compilerOptions": {
-        "target": "es3",
-        "declaration": false
+        "declaration": false,
+        "module": "amd",
+        "target": "es3"
     },
     "files": [
+        "main.ts",
         "utils/mocks.ts",
         "utils/MochaLoader.ts",
         "ItemsHoldr/addItem.ts",
         "ItemsHoldr/checkExistence.ts",
-        "ItemsHoldr/clear.ts",
         "ItemsHoldr/decrease.ts",
         "ItemsHoldr/increase.ts",
         "ItemsHoldr/proliferate.ts",

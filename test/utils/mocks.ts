@@ -1,22 +1,25 @@
-/// <reference path="../../lib/ItemsHoldr.d.ts" />
+import { IItemsHoldr, IItemsHoldrSettings } from "../../src/IItemsHoldr";
+import { IItemValue } from "../../src/IItemValue";
+import { ItemsHoldr } from "../../src/ItemsHoldr";
+import { ItemValue } from "../../src/ItemValue";
 
-const mocks = {
+export const mocks = {
     /**
      * @param ItemsHolder   ItemsHolder object.
      * @param key   Key for the item.
      * @param settings   Settings for the ItemValue.
      * @returns An ItemValue instance.
      */
-    mockItemValue: (ItemsHolder?: ItemsHoldr.IItemsHoldr, key?: string, settings?: any): ItemsHoldr.IItemValue => {
-        return new ItemsHoldr.ItemValue(ItemsHolder, key, settings);
+    mockItemValue: (ItemsHolder?: IItemsHoldr, key?: string, settings?: any): IItemValue => {
+        return new ItemValue(ItemsHolder, key, settings);
     },
 
     /**
      * @param settings   Settings for the ItemsHoldr.
      * @returns An ItemsHoldr instance.
      */
-    mockItemsHoldr: (settings?: ItemsHoldr.IItemsHoldrSettings): ItemsHoldr.IItemsHoldr => {
-        return new ItemsHoldr.ItemsHoldr(settings);
+    mockItemsHoldr: (settings?: IItemsHoldrSettings): IItemsHoldr => {
+        return new ItemsHoldr(settings);
     },
 
     /**

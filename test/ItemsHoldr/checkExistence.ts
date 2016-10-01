@@ -1,12 +1,14 @@
 /// <reference path="../../node_modules/@types/chai/index.d.ts" />
 /// <reference path="../../node_modules/@types/mocha/index.d.ts" />
-/// <reference path="../../lib/ItemsHoldr.d.ts" />
 /// <reference path="../utils/MochaLoader.ts" />
-/// <reference path="../utils/mocks.ts" />
 
-mochaLoader.addTest("should not throw an error if the key exists", (): void => {
+import { IItemsHoldr } from "../../src/IItemsHoldr";
+import { mochaLoader } from "../main";
+import { mocks } from "../utils/mocks";
+
+mochaLoader.it("should not throw an error if the key exists", (): void => {
     // Arrange
-    const ItemsHolder: ItemsHoldr.IItemsHoldr = mocks.mockItemsHoldr({
+    const ItemsHolder: IItemsHoldr = mocks.mockItemsHoldr({
         values: {
             color: {}
         }
@@ -19,9 +21,9 @@ mochaLoader.addTest("should not throw an error if the key exists", (): void => {
     chai.expect(test).not.to.throw();
 });
 
-mochaLoader.addTest("should throw an error if the key does not exist", (): void => {
+mochaLoader.it("should throw an error if the key does not exist", (): void => {
     // Arrange
-    const ItemsHolder: ItemsHoldr.IItemsHoldr = mocks.mockItemsHoldr({ allowNewItems: false });
+    const ItemsHolder: IItemsHoldr = mocks.mockItemsHoldr({ allowNewItems: false });
 
     // Act
     const test: Function = (): void => ItemsHolder.checkExistence("color");
